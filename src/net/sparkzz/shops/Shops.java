@@ -2,6 +2,7 @@ package net.sparkzz.shops;
 
 import net.milkbowl.vault.economy.Economy;
 import net.sparkzz.shops.util.Logger;
+import net.sparkzz.shops.util.Utility;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -29,6 +30,9 @@ public class Shops extends JavaPlugin {
 			return;
 		}
 		log.info("Successfully linked to Vault!");
+
+		Utility.log = this.log;
+		Utility.econ = this.economy;
 
 		log.info("Shops has been enabled!");
 	}
