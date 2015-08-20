@@ -3,3 +3,17 @@ version: 1.0
 main: net.sparkzz.shops.Shops
 author: MrSparkzz
 description: Command/Location based shoping plugin.
+
+commands:
+  buy:
+    description: Buy something from a store.
+  sell:
+    description: Sell something to a store.
+
+permissions:
+  shops.buy:
+    default: true
+    description: Allow a player to buy from a shop.
+  shops.sell:
+    default: true
+    description: Allow a player to sell to a shop.

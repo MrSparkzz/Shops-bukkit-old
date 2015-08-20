@@ -1,5 +1,6 @@
 package net.sparkzz.shops.command;
 
+import net.md_5.bungee.api.ChatColor;
 import net.sparkzz.shops.util.Utility;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -36,7 +37,7 @@ public abstract class Command extends Utility implements CommandExecutor {
 		this.command = command.toString();
 		this.args = args;
 
-		if (!process()) return false;
+		if (!process()) sender.sendMessage(ChatColor.GRAY + "" + ChatColor.ITALIC + usage);
 		return true;
 	}
 }

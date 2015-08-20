@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="Shops">
+    <output-path>C:/Servers/Spigot/plugins</output-path>
+    <root id="archive" name="Shops.jar">
+      <element id="module-output" name="Shops" />
+    </root>
+  </artifact>
+</component>

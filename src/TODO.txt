@@ -1,0 +1,8 @@
+- Item Database
+- Shops storage (shops & locations/inventory/prices)
+- undo transaction (/shops undo) configurable time based undo?
+- Shops command
+- Flatfile storage
+- SQL?
+- Fix inventory.remove() bug where it wont remove items properly (amount based)
+- Handle damage values (5:2 - birch wood planks)
