@@ -1,0 +1,5 @@
+name: Shops
+version: 1.0
+main: net.sparkzz.shops.Shops
+author: MrSparkzz
+description: Command/Location based shoping plugin.
