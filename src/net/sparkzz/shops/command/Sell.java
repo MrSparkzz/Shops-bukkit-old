@@ -1,9 +1,11 @@
 package net.sparkzz.shops.command;
 
-import net.md_5.bungee.api.ChatColor;
+import net.milkbowl.vault.item.ItemInfo;
+import net.milkbowl.vault.item.Items;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 
 /**
  * Created by Brendon on 8/20/2015.
@@ -25,41 +27,111 @@ public class Sell extends Command {
 
 		Player player = (Player) sender;
 
-		int id = 0, amount = 0;
+		int amount = -1;
+		ItemInfo item = null;
+		short damage;
+		String rawDamage = "0", rawId = null;
 
 		if (args.length == 0) {
-				id = player.getInventory().getItemInHand().getTypeId();
-				amount = player.getInventory().getItemInHand().getAmount();
-		} else if (args.length == 1) {
-			id = player.getInventory().getItemInHand().getTypeId();
+			if (player.getItemInHand() == null || player.getItemInHand().getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "You aren't holding any items!");
+				return false;
+			}
 
-			try {
+			item = Items.itemByStack(player.getItemInHand());
+			amount = player.getItemInHand().getAmount();
+		} else if (args.length == 1) {
+			if (player.getItemInHand() == null || player.getItemInHand().getType() == Material.AIR) {
+				player.sendMessage(ChatColor.RED + "You aren't holding any items!");
+				return false;
+			}
+
+			item = Items.itemByStack(player.getItemInHand());
+
+			if (isInt(args[0]))
 				amount = Integer.parseInt(args[0]);
-			} catch (NumberFormatException exception) {
-				sender.sendMessage(ChatColor.RED + "Your amount was an invalid number!");
+			else {
+				player.sendMessage(ChatColor.RED + "Invalid quantity!");
 				return false;
 			}
 		} else {
-			try {
-				id = Integer.parseInt(args[0]);
+			if (args[0].contains(":")) {
+				rawId = args[0].split(":")[0];
+				rawDamage = args[0].split(":")[1];
+			} else {
+				rawId = args[0];
+			}
+
+			if (isInt(args[1]))
 				amount = Integer.parseInt(args[1]);
-			} catch (NumberFormatException exception) {
-				sender.sendMessage(ChatColor.RED + "One of your numbers was invalid!");
+			else {
+				player.sendMessage(ChatColor.RED + "Invalid quantity!");
+				return true;
 			}
 		}
 
-		if (player.getInventory().contains(Material.getMaterial(id), amount)) {
-			if (econ.depositPlayer(player, 20 * amount).transactionSuccess()) {
-				player.getInventory().remove(new ItemStack(Material.getMaterial(id), amount));
-				player.sendMessage(ChatColor.GREEN + "You have sold: " + ChatColor.GOLD + amount + ChatColor.GREEN + " of " + ChatColor.GOLD + id + ChatColor.GREEN + "!");
-				return true;
-			}
+		if (isInt(rawDamage))
+			damage = Short.parseShort(rawDamage);
+		else {
+			player.sendMessage(ChatColor.RED + "Damage value of " + ChatColor.GOLD + rawDamage + ChatColor.RED + " is invalid!");
+			return false;
+		}
 
-			player.sendMessage(ChatColor.RED + "Insufficient Funds");
+		if (isInt(rawId))
+			item = Items.itemById(Integer.parseInt(rawId), damage);
+		else if (rawId != null)
+			item = Items.itemByType(Items.itemByString(rawId).material, damage);
+
+		if (item == null) {
+			player.sendMessage(ChatColor.RED + "Item " + ChatColor.GOLD + rawId + ChatColor.RED + " could not be found!");
+			return false;
+		}
+
+		if (amount < 0) {
+			player.sendMessage(ChatColor.RED + "Invalid quantity!");
 			return true;
 		}
 
-		player.sendMessage(ChatColor.RED + "You do not have enough of this item!");
+		sell(item, amount);
 		return true;
+	}
+
+	private void sell(ItemInfo item, int amount) {
+		Player player = (Player) sender;
+
+		boolean unlimitedStock = false, unlimitedMoney = false;
+		double price = 20;
+		OfflinePlayer owner = null;
+
+		if (price == -1) {
+			player.sendMessage(ChatColor.GOLD + owner.getName() + ChatColor.RED + " is not buying any " + ChatColor.GOLD + item.name + ChatColor.RED + " at this time!");
+			return;
+		}
+
+		int inventory = countItems(player.getInventory(), item);
+
+		if (inventory == 0) {
+			player.sendMessage(ChatColor.RED + "You don't have any " + ChatColor.GOLD + item.name + "s" + ChatColor.RED + "!");
+			return;
+		}
+
+		if (amount > inventory) {
+			player.sendMessage(ChatColor.RED + "You only have " + ChatColor.GOLD + inventory + ChatColor.RED + " in your inventory that can be sold!");
+			return;
+		}
+
+		double total = price * amount;
+
+		if (!unlimitedMoney && owner != null) {
+			// TODO: take from owner
+		}
+
+		if (econ.depositPlayer(player, total).transactionSuccess()) {
+			removeItems(player.getInventory(), item, amount);
+			player.sendMessage(ChatColor.GREEN + "You have sold " + ChatColor.GOLD + amount + " " + item.name + ChatColor.GREEN + " for " + ChatColor.GOLD + econ.format(total) + ChatColor.GREEN + "!");
+			return;
+		}
+
+		player.sendMessage(ChatColor.RED + "Insufficient funds!");
 	}
 }

@@ -17,3 +17,8 @@ permissions:
   shops.sell:
     default: true
     description: Allow a player to sell to a shop.
+  shops.*:
+    default: op
+    children:
+      shops.buy: true
+      shops.sell: true

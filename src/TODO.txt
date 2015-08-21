@@ -6,3 +6,5 @@
 - SQL?
 - Fix inventory.remove() bug where it wont remove items properly (amount based)
 - Handle damage values (5:2 - birch wood planks)
+- Max stock/Min stock/Max Money/Min Money for stores
+- Transaction logging (maybe triggered by minimum transaction size) configurable
