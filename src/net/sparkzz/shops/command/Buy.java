@@ -71,7 +71,7 @@ public class Buy extends Command {
 		Player player = (Player) sender;
 
 		boolean unlimitedStock = false, unlimitedMoney = false;
-		double price = 20;
+		double price = getShop("Spawn Shop").getBuyPrice(item);
 		int stock = 100;
 		OfflinePlayer owner = null;
 

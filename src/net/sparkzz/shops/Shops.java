@@ -3,6 +3,7 @@ package net.sparkzz.shops;
 import net.milkbowl.vault.economy.Economy;
 import net.sparkzz.shops.command.Buy;
 import net.sparkzz.shops.command.Sell;
+import net.sparkzz.shops.storage.Shop;
 import net.sparkzz.shops.util.Logger;
 import net.sparkzz.shops.util.Utility;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -35,6 +36,10 @@ public class Shops extends JavaPlugin {
 
 		Utility.log = this.log;
 		Utility.econ = this.economy;
+
+		Shop shop = new Shop("Spawn Shop");
+
+		Utility.addShop(shop);
 
 		setupCommands();
 

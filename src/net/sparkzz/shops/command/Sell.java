@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
 public class Sell extends Command {
 
 	public Sell() {
-		super("Sell to the shop you're in.", "shops.sell", "/sell <id:amount> <amount>");
+		super("Sell to the shop you're in.", "shops.sell", "/sell <id|amount> <amount>");
 	}
 
 	@Override
@@ -100,11 +100,11 @@ public class Sell extends Command {
 		Player player = (Player) sender;
 
 		boolean unlimitedStock = false, unlimitedMoney = false;
-		double price = 20;
+		double price = getShop("Spawn Shop").getSellPrice(item);
 		OfflinePlayer owner = null;
 
 		if (price == -1) {
-			player.sendMessage(ChatColor.GOLD + owner.getName() + ChatColor.RED + " is not buying any " + ChatColor.GOLD + item.name + ChatColor.RED + " at this time!");
+			player.sendMessage(ChatColor.RED + "This shop is not buying any " + ChatColor.GOLD + item.name + ChatColor.RED + " at this time!");
 			return;
 		}
 
