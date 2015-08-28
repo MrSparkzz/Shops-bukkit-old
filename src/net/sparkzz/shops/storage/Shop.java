@@ -3,46 +3,137 @@ package net.sparkzz.shops.storage;
 import net.milkbowl.vault.item.ItemInfo;
 import net.milkbowl.vault.item.Items;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by Brendon on 8/25/2015.
  */
 public class Shop {
 
-	private Map<ItemInfo, Double[]> price = Collections.synchronizedMap(new HashMap<>());
+	private boolean limitlessBalance = false, limitlessStock = false;
+	private Date created;
+	private Map<ItemInfo, Map<String, Object>> inv = Collections.synchronizedMap(new HashMap<>());
+	private OfflinePlayer owner;
 	private String name;
+	private long id;
 
 	public Shop(String name) {
 		this.name = name;
 	}
 
+	public boolean isLimitlessBalance() {
+		return limitlessBalance;
+	}
+
+	public boolean isLimitlessStock() {
+		return limitlessStock;
+	}
+
 	public double getBuyPrice(ItemInfo item) {
-		if (price.containsKey(item))
-			return price.get(item)[0];
+		if (inv.containsKey(item))
+			return (double) inv.get(item).get("buyPrice");
 		return -1;
 	}
 
 	public double getSellPrice(ItemInfo item) {
-		if (price.containsKey(item))
-			return price.get(item)[1];
+		if (inv.containsKey(item))
+			return (double) inv.get(item).get("sellPrice");
 		return -1;
+	}
+
+	public int getStock(ItemInfo item) {
+		if (inv.containsKey(item))
+			return (int) inv.get(item).get("stock");
+		return 0;
+	}
+
+	public int getMaxStock(ItemInfo item) {
+		if (inv.containsKey(item))
+			return (int) inv.get(item).get("maxStock");
+		return -1;
+	}
+
+	public List<String> getItemsAsFormattedList() {
+		List<String> list = new ArrayList<>();
+
+		for (ItemInfo item : inv.keySet()) {
+			String formatted;
+
+			if (item.getSubTypeId() > 0)
+				formatted = item.getId() + ":" + item.getSubTypeId() + ",";
+			else formatted = item.getId() + ",";
+
+			formatted += inv.get(item).get("buyPrice") + ",";
+			formatted += inv.get(item).get("sellPrice") + ",";
+			formatted += inv.get(item).get("stock") + ",";
+			formatted += inv.get(item).get("maxStock");
+
+			list.add(formatted);
+		}
+
+		return list;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public OfflinePlayer getOwner() {
+		return owner;
+	}
+
+	public String getFormattedDate() {
+		SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy;HH:mm:ss");
+		return format.format(created);
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	private void add(Material material, double buy, double sell) {
-		add(material, 0, buy, sell);
+	public void add(Material material, int damage, double buy, double sell, int inventory, int maxInventory) {
+		Map<String, Object> invData = Collections.synchronizedMap(new HashMap<>());
+
+		invData.put("buyPrice", buy);
+		invData.put("sellPrice", sell);
+		invData.put("stock", inventory);
+		invData.put("maxStock", maxInventory);
+
+		this.inv.put(Items.itemByType(material, (short) damage), invData);
 	}
 
-	private void add(Material material, int damage, double buy, double sell) {
-		Double[] required = {buy, sell};
+	public void remove(Material material) {
+		if (inv.containsKey(Items.itemByType(material)))
+			inv.remove(Items.itemByType(material));
+	}
 
-		price.put(Items.itemByType(material, (short) damage), required);
+	public void setDateCreated() {
+		this.created = new Date();
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setOwner(OfflinePlayer player) {
+		this.owner = player;
+	}
+
+	protected void setDateFromFile(String date) throws ParseException {
+		SimpleDateFormat format = new SimpleDateFormat("mm/dd/yyyy;hh:mm:ss");
+		this.created = format.parse(date);
+	}
+
+	public void setLimitlessBalance(boolean value) {
+		this.limitlessBalance = value;
+	}
+
+	public void setLimitlessStock(boolean value) {
+		this.limitlessStock = value;
 	}
 }

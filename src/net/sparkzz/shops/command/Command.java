@@ -46,29 +46,6 @@ public abstract class Command extends Utility implements CommandExecutor {
 		return true;
 	}
 
-	protected boolean isInt(String string) {
-		if (string == null) return false;
-
-		int length = string.length();
-
-		if (length == 0) return false;
-
-		int i = 0;
-
-		if (string.charAt(0) == '-') {
-			if (length == 1) return false;
-
-			i = 1;
-		}
-
-		for (; i < length; i++) {
-			char c = string.charAt(i);
-
-			if (c <= '/' || c >= ':') return false;
-		}
-		return true;
-	}
-
 	protected int countItems(PlayerInventory inventory, ItemInfo item) {
 		int amount = 0;
 

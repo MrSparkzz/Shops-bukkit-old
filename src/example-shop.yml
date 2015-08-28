@@ -1,0 +1,12 @@
+name: Example Shop
+owner: a307b2a8-cc58-4bc1-8ee4-910053ac99d2
+created: 8/26/2015;10:29:30
+cuboid:
+  pos1: 12,64,12
+  pos2: 17,70,17
+inventory:
+  - 4,1,1,512,-1 # item:damage,buyPrice,sellPrice,currentInventory,maxInventory
+  - 1:2,-1,2,0,1500 # -1 means Not selling/buying or max inventory
+unlimited:
+  balance: true
+  inventory: true
