@@ -1,7 +1,5 @@
 - Shops storage (shops & locations/inventory/prices)
-- undo transaction (/shops undo) configurable time based undo?
 - Shops command
 - Flatfile storage
 - SQL?
-- Max stock/Min stock/Max Money/Min Money for stores
 - Transaction logging (maybe triggered by minimum transaction size) configurable

@@ -2,6 +2,8 @@ package net.sparkzz.shops.command;
 
 import net.milkbowl.vault.item.ItemInfo;
 import net.milkbowl.vault.item.Items;
+import net.sparkzz.shops.storage.Shop;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
@@ -98,10 +100,11 @@ public class Sell extends Command {
 
 	private void sell(ItemInfo item, int amount) {
 		Player player = (Player) sender;
+		Shop shop = getShop("Example Shop");
 
-		boolean unlimitedStock = false, unlimitedMoney = false;
-		double price = getShop("Spawn Shop").getSellPrice(item);
-		OfflinePlayer owner = null;
+		boolean unlimitedStock = shop.isLimitlessStock(), unlimitedMoney = shop.isLimitlessBalance();
+		double price = shop.getSellPrice(item);
+		OfflinePlayer owner = shop.getOwner();
 
 		if (price == -1) {
 			player.sendMessage(ChatColor.RED + "This shop is not buying any " + ChatColor.GOLD + item.name + ChatColor.RED + " at this time!");
@@ -120,18 +123,41 @@ public class Sell extends Command {
 			return;
 		}
 
-		double total = price * amount;
-
-		if (!unlimitedMoney && owner != null) {
-			// TODO: take from owner
-		}
-
-		if (econ.depositPlayer(player, total).transactionSuccess()) {
-			removeItems(player.getInventory(), item, amount);
-			player.sendMessage(ChatColor.GREEN + "You have sold " + ChatColor.GOLD + amount + " " + item.name + ChatColor.GREEN + " for " + ChatColor.GOLD + econ.format(total) + ChatColor.GREEN + "!");
+		if (shop.getStock(item) >= shop.getMaxStock(item)) {
+			player.sendMessage(ChatColor.RED + "The shop is currently fully stocked up on " + ChatColor.GOLD + item.name);
 			return;
 		}
 
-		player.sendMessage(ChatColor.RED + "Insufficient funds!");
+		if (amount > shop.getMaxStock(item) || amount > (shop.getMaxStock(item) - shop.getStock(item))) {
+			player.sendMessage(ChatColor.RED + "The shop only has room for " + ChatColor.GOLD + (shop.getMaxStock(item) - shop.getStock(item)) + ChatColor.RED + " more " + ChatColor.GOLD + item.name);
+			amount = shop.getMaxStock(item) - shop.getStock(item);
+		}
+
+		double total = price * amount;
+
+		if (!unlimitedMoney && owner != null) {
+			if (econ.withdrawPlayer(owner, total).transactionSuccess()) {
+				if (owner.isOnline())
+					Bukkit.getPlayer(owner.getUniqueId()).sendMessage(ChatColor.GOLD + player.getDisplayName() + ChatColor.GREEN + " has sold " + ChatColor.GOLD + amount + " " + item.name + ChatColor.GREEN + " to you for " + ChatColor.GOLD + econ.format(total) + ChatColor.GREEN + "!");
+			} else {
+				player.sendMessage(ChatColor.RED + "The shop owner does not have enough money to pay for this transaction!");
+				return;
+			}
+		}
+
+		if (econ.depositPlayer(player, total).transactionSuccess()) {
+			if (!unlimitedStock) shop.addStock(item, amount);
+			removeItems(player.getInventory(), item, amount);
+			player.sendMessage(ChatColor.GREEN + "You have sold " + ChatColor.GOLD + amount + " " + item.name + ChatColor.GREEN + " for " + ChatColor.GOLD + econ.format(total) + ChatColor.GREEN + "!");
+			return;
+		} else {
+			player.sendMessage(ChatColor.RED + "There was an issue in fulfilling your transaction!");
+
+			if (econ.depositPlayer(owner, total).transactionSuccess()) {
+				if (owner.isOnline())
+					Bukkit.getPlayer(owner.getUniqueId()).sendMessage(ChatColor.RED + "There was an issue during a transaction with your shop, your money has been returned!");
+			}
+			return;
+		}
 	}
 }

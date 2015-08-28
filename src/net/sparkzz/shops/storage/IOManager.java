@@ -107,7 +107,9 @@ public class IOManager extends Utility {
 				if (isInt(values[4]))
 					maxInventory = Integer.parseInt(values[4]);
 
-			shop.add(item.getType(), damage, buyPrice, sellPrice, inventoryAmount, maxInventory);
+			shop.add(item, buyPrice, sellPrice, inventoryAmount, maxInventory);
+			log.info(values[0] + ", " + values[1] + ", " + values[2] + ", " + values[3] + ", " + values[4]);
+			log.info("Adding: " + item.getId() + ":" + item.getSubTypeId() + ", buyPrice: " + buyPrice + ", sellPrice: " + sellPrice + ", stock: " + inventoryAmount + ", maxStock: " + maxInventory);
 		}
 
 		addShop(shop);

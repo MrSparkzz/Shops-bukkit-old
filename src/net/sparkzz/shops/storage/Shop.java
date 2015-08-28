@@ -4,7 +4,6 @@ import net.milkbowl.vault.item.ItemInfo;
 import net.milkbowl.vault.item.Items;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -93,11 +92,15 @@ public class Shop {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
+	}
+
+	public void add(ItemInfo item, double buy, double sell, int inventory, int maxInventory) {
+		add(item.getType(), item.getSubTypeId(), buy, sell, inventory, maxInventory);
 	}
 
 	public void add(Material material, int damage, double buy, double sell, int inventory, int maxInventory) {
-		Map<String, Object> invData = Collections.synchronizedMap(new HashMap<>());
+		Map<String, Object> invData = new HashMap<>();
 
 		invData.put("buyPrice", buy);
 		invData.put("sellPrice", sell);
@@ -105,6 +108,14 @@ public class Shop {
 		invData.put("maxStock", maxInventory);
 
 		this.inv.put(Items.itemByType(material, (short) damage), invData);
+	}
+
+	public void addStock(ItemInfo item, int amount) {
+		inv.get(item).put("stock", getStock(item) + amount);
+	}
+
+	public void removeStock(ItemInfo item, int amount) {
+		inv.get(item).put("stock", getStock(item) - amount);
 	}
 
 	public void remove(Material material) {

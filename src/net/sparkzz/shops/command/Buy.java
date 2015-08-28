@@ -2,6 +2,8 @@ package net.sparkzz.shops.command;
 
 import net.milkbowl.vault.item.ItemInfo;
 import net.milkbowl.vault.item.Items;
+import net.sparkzz.shops.storage.Shop;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -69,11 +71,22 @@ public class Buy extends Command {
 
 	private void buy(ItemInfo item, int amount) {
 		Player player = (Player) sender;
+		Shop shop = getShop("Example Shop");
 
-		boolean unlimitedStock = false, unlimitedMoney = false;
-		double price = getShop("Spawn Shop").getBuyPrice(item);
-		int stock = 100;
-		OfflinePlayer owner = null;
+		boolean unlimitedStock = shop.isLimitlessStock(), unlimitedMoney = shop.isLimitlessBalance();
+		double price = shop.getBuyPrice(item);
+		int stock = shop.getStock(item);
+		OfflinePlayer owner = shop.getOwner();
+
+		if (price == -1) {
+			player.sendMessage(ChatColor.RED + "This shop is not selling any " + ChatColor.GOLD + item.name + ChatColor.RED + " at this time!");
+			return;
+		}
+
+		if (stock == 0) {
+			player.sendMessage(ChatColor.RED + "This shop doesn't have anymore " + ChatColor.GOLD + item.name);
+			return;
+		}
 
 		if (amount > stock && !unlimitedStock) {
 			amount = stock;
@@ -94,12 +107,18 @@ public class Buy extends Command {
 
 		double total = amount * price;
 
-		if (!unlimitedMoney || owner != null) {
-			// TODO: pay owner
+		if (!unlimitedMoney && owner != null) {
+			if (econ.depositPlayer(owner, total).transactionSuccess()) {
+				if (owner.isOnline())
+					Bukkit.getPlayer(owner.getUniqueId()).sendMessage(ChatColor.GOLD + player.getDisplayName() + ChatColor.GREEN + " has purchased " + ChatColor.GOLD + amount + " " + item.name + ChatColor.GREEN + " from you for " + ChatColor.GOLD + econ.format(total) + ChatColor.GREEN + "!");
+			} else {
+				player.sendMessage(ChatColor.RED + "There was an issue in fulfilling your transaction!");
+				return;
+			}
 		}
 
 		if (econ.withdrawPlayer(player, total).transactionSuccess()) {
-			stock -= amount;
+			if (!unlimitedStock) shop.removeStock(item, amount);
 			giveItems(item, amount);
 			player.sendMessage(ChatColor.GREEN + "You have purchased " + ChatColor.GOLD + amount + " "  + item.name + ChatColor.GREEN + " for " + ChatColor.GOLD + econ.format(total) + ChatColor.GREEN + "!");
 			return;
