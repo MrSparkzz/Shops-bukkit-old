@@ -16,7 +16,7 @@ public class Shop {
 
 	private boolean limitlessBalance = false, limitlessStock = false;
 	private Date created;
-	private Map<ItemInfo, Map<String, Object>> inv = Collections.synchronizedMap(new HashMap<>());
+	private Map<ItemInfo, Map<String, Object>> inv = Collections.synchronizedMap(new HashMap<ItemInfo, Map<String, Object>>());
 	private OfflinePlayer owner;
 	private String name;
 	private long id;
@@ -35,30 +35,44 @@ public class Shop {
 
 	public double getBuyPrice(ItemInfo item) {
 		if (inv.containsKey(item))
-			return (double) inv.get(item).get("buyPrice");
+			return (Double) inv.get(item).get("buyPrice");
 		return -1;
 	}
 
 	public double getSellPrice(ItemInfo item) {
 		if (inv.containsKey(item))
-			return (double) inv.get(item).get("sellPrice");
+			return (Double) inv.get(item).get("sellPrice");
 		return -1;
 	}
 
 	public int getStock(ItemInfo item) {
 		if (inv.containsKey(item))
-			return (int) inv.get(item).get("stock");
+			return (Integer) inv.get(item).get("stock");
 		return 0;
 	}
 
 	public int getMaxStock(ItemInfo item) {
 		if (inv.containsKey(item))
-			return (int) inv.get(item).get("maxStock");
+			return (Integer) inv.get(item).get("maxStock");
 		return -1;
 	}
 
+	public List<ItemInfo> getItems() {
+		return new ArrayList<ItemInfo>(inv.keySet());
+	}
+
+	public List<String> getItemsByName() {
+		List<String> names = new ArrayList<String>();
+
+		for (ItemInfo item : inv.keySet()) {
+			names.add(item.getName());
+		}
+
+		return names;
+	}
+
 	public List<String> getItemsAsFormattedList() {
-		List<String> list = new ArrayList<>();
+		List<String> list = new ArrayList<String>();
 
 		for (ItemInfo item : inv.keySet()) {
 			String formatted;
@@ -100,7 +114,7 @@ public class Shop {
 	}
 
 	public void add(Material material, int damage, double buy, double sell, int inventory, int maxInventory) {
-		Map<String, Object> invData = new HashMap<>();
+		Map<String, Object> invData = new HashMap<String, Object>();
 
 		invData.put("buyPrice", buy);
 		invData.put("sellPrice", sell);

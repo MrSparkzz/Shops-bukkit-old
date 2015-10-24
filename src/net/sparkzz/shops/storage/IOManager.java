@@ -91,6 +91,8 @@ public class IOManager extends Utility {
 
 			ItemInfo item = Items.itemById(itemId, damage);
 
+			if (item == null) continue;
+
 			if (values.length >= 1)
 				if (isDouble(values[1]))
 					buyPrice = Double.parseDouble(values[1]);
@@ -108,9 +110,7 @@ public class IOManager extends Utility {
 					maxInventory = Integer.parseInt(values[4]);
 
 			shop.add(item, buyPrice, sellPrice, inventoryAmount, maxInventory);
-			log.info(values[0] + ", " + values[1] + ", " + values[2] + ", " + values[3] + ", " + values[4]);
-			log.info("Adding: " + item.getId() + ":" + item.getSubTypeId() + ", buyPrice: " + buyPrice + ", sellPrice: " + sellPrice + ", stock: " + inventoryAmount + ", maxStock: " + maxInventory);
-		}
+			}
 
 		addShop(shop);
 	}

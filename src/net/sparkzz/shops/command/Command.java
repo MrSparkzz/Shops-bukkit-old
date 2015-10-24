@@ -1,8 +1,8 @@
 package net.sparkzz.shops.command;
 
-import net.md_5.bungee.api.ChatColor;
 import net.milkbowl.vault.item.ItemInfo;
 import net.sparkzz.shops.util.Utility;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

@@ -1,10 +1,10 @@
 package net.sparkzz.shops;
 
 import net.milkbowl.vault.economy.Economy;
+import net.sparkzz.shops.command.Browse;
 import net.sparkzz.shops.command.Buy;
 import net.sparkzz.shops.command.Sell;
 import net.sparkzz.shops.storage.IOManager;
-import net.sparkzz.shops.storage.Shop;
 import net.sparkzz.shops.util.Logger;
 import net.sparkzz.shops.util.Utility;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -59,5 +59,6 @@ public class Shops extends JavaPlugin {
 	private void setupCommands() {
 		getCommand("buy").setExecutor(new Buy());
 		getCommand("sell").setExecutor(new Sell());
+		getCommand("browse").setExecutor(new Browse());
 	}
 }

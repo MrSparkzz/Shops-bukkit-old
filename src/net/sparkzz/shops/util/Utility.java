@@ -13,7 +13,7 @@ import java.util.Map;
  */
 public class Utility {
 
-	private static Map<String, Shop> shops = Collections.synchronizedMap(new HashMap<>());
+	private static Map<String, Shop> shops = Collections.synchronizedMap(new HashMap<String, Shop>());
 
 	public static Logger log;
 	public static Economy econ;

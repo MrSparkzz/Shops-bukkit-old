@@ -1,6 +1,7 @@
 name: Shops
 version: 1.0
 main: net.sparkzz.shops.Shops
+depend: [Vault]
 author: MrSparkzz
 description: Command/Location based shoping plugin.
 
@@ -9,8 +10,13 @@ commands:
     description: Buy something from a store.
   sell:
     description: Sell something to a store.
+  browse:
+    description: Browse the current store.
 
 permissions:
+  shops.browse:
+    default: true
+    description: Allow a player to browse a shop.
   shops.buy:
     default: true
     description: Allow a player to buy from a shop.
@@ -20,5 +26,6 @@ permissions:
   shops.*:
     default: op
     children:
+      shops.browse: true
       shops.buy: true
       shops.sell: true
